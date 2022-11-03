@@ -34,7 +34,7 @@ class EmployeeController(
     fun one(@PathVariable id: Long): Employee = repository.findById(id).orElseThrow { EmployeeNotFoundException(id) }
 
     @PutMapping("/employees/{id}")
-    fun replaceEmployee(@RequestBody newEmployee: Employee, @PathVariable id: Long): ResponseEntity<Employee> {
+    fun replaceEmployee(@RequestBody newEmployee: Employee, @PathVariable id: Long): ResponseEntity<Employee>  {
         val location = ServletUriComponentsBuilder
             .fromCurrentServletMapping()
             .path("/employees/{id}")
