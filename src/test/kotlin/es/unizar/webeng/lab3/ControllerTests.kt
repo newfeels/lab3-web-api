@@ -98,13 +98,11 @@ class ControllerTests {
         } answers {
             Optional.of(Employee("Mary", "Manager", 1))
         }
-
         every {
             employeeRepository.findById(2)
         } answers {
             Optional.empty()
         }
-
         mvc.get("/employees/1").andExpect {
             status { isOk() }
             content {
@@ -112,7 +110,6 @@ class ControllerTests {
                 json(MANAGER_RESPONSE_BODY("Mary", 1))
             }
         }
-
         mvc.get("/employees/1").andExpect {
             status { isOk() }
             content {
@@ -120,13 +117,13 @@ class ControllerTests {
                 json(MANAGER_RESPONSE_BODY("Mary", 1))
             }
         }
-
         mvc.get("/employees/2").andExpect {
             status { isNotFound() }
         }
-
-        // VERIFY
-
+        verify(exactly = 0) {
+            employeeRepository.save(any())
+            employeeRepository.deleteById(any())
+        }
     }
 
     @Test
@@ -139,14 +136,12 @@ class ControllerTests {
         } andThenAnswer {
             Optional.of(Employee("Tom", "Manager", 1))
         }
-
         val employee = slot<Employee>()
         every {
             employeeRepository.save(capture(employee))
         } answers {
             employee.captured
         }
-
         mvc.put("/employees/1") {
             contentType = MediaType.APPLICATION_JSON
             content = MANAGER_REQUEST_BODY("Tom")
@@ -159,7 +154,6 @@ class ControllerTests {
                 json(MANAGER_RESPONSE_BODY("Tom", 1))
             }
         }
-
         mvc.put("/employees/1") {
             contentType = MediaType.APPLICATION_JSON
             content = MANAGER_REQUEST_BODY("Tom")
@@ -172,11 +166,9 @@ class ControllerTests {
                 json(MANAGER_RESPONSE_BODY("Tom", 1))
             }
         }
-
         verify(exactly = 2) {
             employeeRepository.save(Employee("Tom", "Manager", 1))
         }
-
     }
 
     @Test
@@ -189,26 +181,20 @@ class ControllerTests {
         } andThenAnswer {
             Optional.empty()
         }
-
         justRun {
             employeeRepository.deleteById(1)
         }
-
         mvc.delete("/employees/1").andExpect {
             status { isNoContent() }
         }
-
         mvc.delete("/employees/1").andExpect {
             status { isNotFound() }
         }
-
         verify(exactly = 1) {
             employeeRepository.deleteById(1)
         }
-
         verify(exactly = 2) {
             employeeRepository.findById(1)
         }
-
     }
 }
